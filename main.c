@@ -2,43 +2,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 main()
 {
 
-int loop = 1;
-int i = 0;
-extern unsigned int sector_size;
-char input[60];
-const char *fmount = "fmount";
-const char *funmount = "funmount";
-const char *quit = "quit";
+	int loop = 1;  
+	char  line[100];            
+	char  *argv[100]; 
+ 
+    	while (loop == 1) 
+	{                   
+		printf("f: ");     
+		fgets(line, 100, stdin);             
+		 split(line, argv);       
 
-	//call up prompt and take input until user types "quit"
-	while(loop == 1)
-	{
-
-		printf("f: ");
-		fgets(input, 60, stdin);
-
-	   	 if(strncmp(input, fmount, 6) == 0)
-		{
-			printf("wants to mount\n");
-
-	    	}  
-
-	   	 if(strncmp(input, funmount, 8) == 0)
-		{
-		    printf("wants to unmount\n");
-
-	    	}  
-
-	   	 if(strncmp(input, quit, 4) == 0)
-		{
-		    printf("wants to quit\n");
-		
+		if (strcmp(argv[0], "exit") == 0)  
 		loop = 0;
-	    	} 
+
+		else 
+		command(*argv[0], argv); 
+		printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]);  
 	}
+}
 	
 /*
 TODO
@@ -62,7 +47,6 @@ showfile filename: show content of target file as hex dump 15%
 need to finish: writeup, mount and unmount program/fork thingies, write-up, clean up and comment
 */
 
-}
 
 
 
