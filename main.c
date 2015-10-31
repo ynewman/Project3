@@ -1,11 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
+#include <floppy.h>
 main()
 {
-
 	int loop = 1;  
 	char  line[100];            
 	char  *argv[100]; 
@@ -14,14 +9,16 @@ main()
 	{                   
 		printf("f: ");     
 		fgets(line, 100, stdin);             
-		 split(line, argv);       
+		split(line, argv);       
 
 		if (strcmp(argv[0], "exit") == 0)  
 		loop = 0;
 
 		else 
-		command(*argv[0], argv); 
-		printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]);  
+		command(argv); 
+
+		//for testing purposes REMOVE 
+		printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]); 
 	}
 }
 	
