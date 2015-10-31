@@ -26,8 +26,10 @@ int i = 0;
 			line++;      
 	} 
 		*argv = '\0';
-counter -= 2;
-printf("%i\n", counter);
+		counter -= 2;
+		
+		//for testing purposes REMOVE
+		printf("%i\n", counter);
 }
 
 int fmount(char **argv)
