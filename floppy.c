@@ -10,7 +10,7 @@ int counter;
 void split(char *line, char **argv) 
 {
 counter = 0;
-int i = 0;
+int i = 0; 
 
 	while (*line != '\0') 
 	{       
