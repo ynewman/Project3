@@ -1,1 +1,11 @@
-TODO
+* You are asked to develop a Floppy Disk program that allows users to access a floppy disk locally mounted on a computer.
+  You are expected to use C programming language.
+  In your program, all file I/O related operations should use the system calls discussed in our lectures.
+* NAME - %
+  NAME - %
+  Mark Thorn - %
+* To make make, type: make floppy
+  To run, type: make run
+  
+* SAMPLE RUN
+* NOTE:

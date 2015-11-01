@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 #ifndef __FLOPPY_H
 #define __FLOPPY_H
