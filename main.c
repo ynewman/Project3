@@ -16,6 +16,7 @@ int main()
 			command(argv);
 		//for testing purposes REMOVE
 		//printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]);
+		printf("\n");
 	}
 	return 0;
 }
