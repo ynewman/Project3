@@ -1,5 +1,6 @@
 
 #include <floppy.h>
+#define SECTOR 512
 unsigned short number_FAT;
 unsigned short sector_FAT;
 unsigned short sector_per_cluster;
@@ -56,13 +57,13 @@ int fmount(char **argv)
 
 		strcpy(image, argv[1]);
 	    	lseek(fd, 0, SEEK_SET);
-	   	read(fd, buff, 512);
+	   	read(fd, buff, SECTOR);
 		//compute # for structure
 		number_FAT = buff[16];
-		sectors_per_fat = buff[23] * 256 + buff[22];
+		sectors_per_fat = buff[23] * (SECTOR/2) + buff[22];
 		sector_per_cluster = buff[13];
 		root_entries = buff[17]; //Not sure how to get this (!)
-		sector_size = buff[12] * 256 + buff[11];
+		sector_size = buff[12] * (SECTOR/2) + buff[11];
 
 		mounted = true;
 	}
@@ -101,6 +102,27 @@ char dummy[30];
 
 return 0;
 }
+int showsector(char **argv) {
+	int sectorNumber = atoi(argv[1]); //convert input to int
+	if (sectorNumber > 2880 || sectorNumber < 0)  {
+		printf("Please pass a valid sector");
+		return -1;
+	}
+	if (sectorNumber == 0)
+		sectorNumber = 1;
+
+	char buffer[SECTOR] = {'\0'};
+	int iterator;
+	lseek(3, sectorNumber * SECTOR, SEEK_SET);
+	read(3, buffer, SECTOR);
+	printf("\t 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F\n");
+	for (iterator = 0; iterator < SECTOR; iterator++) {
+		if(iterator % 16 == 0) //next level of sector
+			printf("\n%03X\t", iterator);
+    printf("%02X ", (unsigned char) buffer[iterator]);
+	}
+
+}
 
 structure() {
 	printf("Number of FAT:\t%i\n", number_FAT);
@@ -130,7 +152,11 @@ void command(char **argv)
 				structure();
 			else
 				printf("You must mount a floppy first.");
-
+		if(strcmp(argv[0], "showsector") == 0)
+			if (mounted)
+				showsector(argv);
+			else
+				printf("You must mount a floppy first.");
 
 		//add cases for other options as we build them
 
@@ -149,13 +175,6 @@ void command(char **argv)
 				printf("You must mount a floppy first.");
 		}
 /* TODO
-		if(strcmp(argv[0], "showsector") == 0)
-		{
-			if (mounted)
-				showsector();
-			else
-				printf("You must mount a floppy first.");
-		}
 
 		if(strcmp(argv[0], "showfat") == 0)
 		{
