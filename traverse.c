@@ -213,17 +213,12 @@ void printDir(unsigned short cluster, char *directory, unsigned short file_bytes
 //*******I changed this from main to traverse so it would combine with the rest of the files.
 int traverse(int argc, char **argv) {
 
+	//******simplified this a touch
 	char* flag = "";
-	int arg_count;
-	for (argc--, argv++; argc > 0; argc -= arg_count, argv += arg_count) 
-	{
-		arg_count = 1;
-		if (strcmp(*argv, "-l") == 0) 
-		{
-			flag = "-l";
-		}
-	}
+	if(strcmp(argv[argc], "-l") == 0)
+		flag = "-l";
 			printf("%s\n", image);
+
 	//******this now uses the global array "image" with the mounted file's filename 
 	if ((fileS = open(image, O_RDONLY)) < 0) 
 	{
