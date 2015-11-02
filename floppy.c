@@ -34,9 +34,6 @@ int i = 0;
 	}
 		*argv = '\0';
 		counter -= 2;
-
-		//for testing purposes REMOVE
-		//printf("%i\n", counter);
 }
 
 int fmount(char **argv)
@@ -61,8 +58,6 @@ int fmount(char **argv)
 	   	read(fd, buff, SECTOR);
 
 		//pull information from boot and save as global variables
-
-
 		sector_size = buff[12] * (SECTOR/2) + buff[11];
 		fat_bytes = sectors_per_fat * sector_size;
 		cluster = (((unsigned short) buff[26]) & 0xff) | (((unsigned short) buff[27]) & 0x0f)<<8;
@@ -78,15 +73,12 @@ int fmount(char **argv)
 		sectors_per_fat = low | (high << 8);
 
 		mounted = true;
-	}
+		}
 	else
 	{
 	printf("Error: File was not a floppy image. Nothing was mounted.\n");
 	return -1;
 	}
-
-	//for testing purposes REMOVE
-	//printf("%i\n", sector_size);
 
 return 0;
 }
@@ -103,8 +95,7 @@ char dummy[30];
 	else
 	{
 		//clear all the variables, close file directory and free buffer
-		close(fd);
-		free(buff);
+
 		num_of_fats = 0;
 		sector_per_cluster = 0;
 		root_entries = 0;
@@ -114,11 +105,10 @@ char dummy[30];
 		cluster = 0;
 		sector_size = 0;
 		strcpy(image, dummy);
+		close(fd);
+		free(buff);
 		mounted = false;
-
-	//for testing purposes REMOVE (shows 0 if successful)
-	//printf("%i\n", sector_size);
-}
+	}
 
 return 0;
 }
@@ -152,7 +142,6 @@ structure() {
 	printf("Number of ROOT entries:\t\t%i\n", root_entries);
 	printf("Number of bytes per sector:\t%i\n", sector_size);
 	printf("---Sector #---\t--Sector Types---\n");
-	//according to our notes it's the following setup
 	printf("     0        		BOOT\n");
 	printf("  01 -- 09		FAT1\n");
 	printf("  10 -- 18		FAT2\n");
@@ -190,11 +179,15 @@ void command(char **argv)
 /* TODO
 
 		if(strcmp(argv[0], "showfat") == 0)
-		{
 			if (mounted)
 				showfat();
 			else
-				printf("You must mount a floppy first.");
-		}
+				printf("You must mount a floppy first.\n");
+		if(strcmp(argv[0], "showfile") == 0)	
+			if (mounted)
+				showfat();
+			else
+				printf("You must mount a floppy first.\n");
+
 */
 }
