@@ -40,7 +40,7 @@ int traverse(int argc, char **argv);
 
 int showsector(char **argv);
 
-structure();
+void structure();
 
 void help();
 
