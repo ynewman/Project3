@@ -11,7 +11,7 @@ unsigned short cluster;
 
 int fd;
 char *buff;
-bool unmounted; //changed this to use it negatively so that it's assumed nothing is mounted
+bool mounted;
 int counter;
 
 void split(char *line, char **argv)
@@ -42,7 +42,6 @@ int fmount(char **argv)
 	buff = (char*)malloc(sizeof(char *) * 100);
 
 	//if the file extension is .img, the file is open and read to buffer.
-	//sectorsize is determined.
  	if (strstr(argv[1], ".img") != NULL)
 	{
 		fd = open(argv[1], O_RDONLY);
@@ -52,7 +51,7 @@ int fmount(char **argv)
 		printf("Error: Nothing was mounted.\n");
 		return -1;
 		}
-
+printf("mounted = %d \n", mounted);
 		strcpy(image, argv[1]);
 	    	lseek(fd, 0, SEEK_SET);
 	   	read(fd, buff, SECTOR);
@@ -72,7 +71,8 @@ int fmount(char **argv)
 		high = ((unsigned short) buff[23]) & 0xff;
 		sectors_per_fat = low | (high << 8);
 
-		unmounted = false;
+		mounted = true;
+printf("mounted = %d \n", mounted);
 		}
 	else
 	{
@@ -87,7 +87,7 @@ int fumount()
 {
 char dummy[30];
 
-	if (unmounted = true)
+	if (mounted = false)
 	{
 		printf("Error: Nothing is currently mounted.\n");
 		return -1;
@@ -107,7 +107,7 @@ char dummy[30];
 		strcpy(image, dummy);
 		close(fd);
 		free(buff);
-		unmounted = true;
+		mounted = false;
 	}
 
 return 0;
@@ -173,17 +173,17 @@ void command(char **argv)
 		if (strcmp(argv[0], "help") == 0)
 			help();
 		if (strcmp(argv[0], "structure") == 0)
-			if (unmounted)
+			if (mounted)
 				printf("You must mount a floppy first.\n");
 			else
 				structure();
 		if(strcmp(argv[0], "showsector") == 0)
-			if (unmounted)
+			if (mounted)
 				printf("You must mount a floppy first.\n");
 			else
 				showsector(argv);
 		if(strcmp(argv[0], "traverse") == 0)
-			if (unmounted)
+			if (mounted)
 				printf("You must mount a floppy first.\n");		
 			else
 				traverse(counter, argv);
