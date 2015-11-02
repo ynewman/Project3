@@ -51,7 +51,7 @@ int fmount(char **argv)
 		printf("Error: Nothing was mounted.\n");
 		return -1;
 		}
-printf("mounted = %d \n", mounted);
+
 		strcpy(image, argv[1]);
 	    	lseek(fd, 0, SEEK_SET);
 	   	read(fd, buff, SECTOR);
@@ -72,7 +72,6 @@ printf("mounted = %d \n", mounted);
 		sectors_per_fat = low | (high << 8);
 
 		mounted = true;
-printf("mounted = %d \n", mounted);
 		}
 	else
 	{
@@ -95,7 +94,6 @@ char dummy[30];
 	else
 	{
 		//clear all the variables, close file directory and free buffer
-
 		num_of_fats = 0;
 		sector_per_cluster = 0;
 		root_entries = 0;
