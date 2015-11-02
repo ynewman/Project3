@@ -1,31 +1,27 @@
 #include <floppy.h>
-main()
+int main()
 {
-	int loop = 1;  
-	char  line[100];            
-	char  *argv[100]; 
- 
-    	while (loop == 1) 
-	{                   
-		printf("f: ");     
-		fgets(line, 100, stdin);             
-		split(line, argv);       
+	bool loop = true;
+	char  line[100];
+	char  *argv[100];
+  while (loop)
+	{
+		printf("f: ");
+		fgets(line, 100, stdin);
+		split(line, argv);
 
-		if (strcmp(argv[0], "exit") == 0)  
-		loop = 0;
-
-		else 
-		command(argv); 
-
-		//for testing purposes REMOVE 
-		printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]); 
+		if (strcmp(argv[0], "quit") == 0)
+			return 0;
+		else
+			command(argv);
+		//for testing purposes REMOVE
+		//printf("first word: %s\nsecond word: %s\n", argv[0], argv[1]);
 	}
+	return 0;
 }
-	
+
 /*
 TODO
-
-help: show commands supported 5%
 
 structure: list structure 10%
 	num FAT, num sectors used by FAT, num sectors/cluster, num ROOT entries, num bytes/sector
@@ -43,7 +39,3 @@ showfile filename: show content of target file as hex dump 15%
 
 need to finish: writeup, mount and unmount program/fork thingies, write-up, clean up and comment
 */
-
-
-
-
