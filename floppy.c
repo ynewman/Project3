@@ -1,6 +1,6 @@
-
 #include <floppy.h>
 #define SECTOR 512
+
 unsigned short num_of_fats;
 unsigned short sector_per_cluster;
 unsigned short root_entries;
@@ -11,7 +11,7 @@ unsigned short cluster;
 
 int fd;
 char *buff;
-bool mounted;
+bool unmounted; //changed this to use it negatively so that it's assumed nothing is mounted
 int counter;
 
 void split(char *line, char **argv)
@@ -72,7 +72,7 @@ int fmount(char **argv)
 		high = ((unsigned short) buff[23]) & 0xff;
 		sectors_per_fat = low | (high << 8);
 
-		mounted = true;
+		unmounted = false;
 		}
 	else
 	{
@@ -87,7 +87,7 @@ int fumount()
 {
 char dummy[30];
 
-	if (sector_size == 0)
+	if (unmounted = true)
 	{
 		printf("Error: Nothing is currently mounted.\n");
 		return -1;
@@ -107,7 +107,7 @@ char dummy[30];
 		strcpy(image, dummy);
 		close(fd);
 		free(buff);
-		mounted = false;
+		unmounted = true;
 	}
 
 return 0;
@@ -132,10 +132,10 @@ int showsector(char **argv) {
     	printf("%02X ", (unsigned char) buffer[iterator]);
 	}
 	printf("\n");
-
 }
 
-structure() {
+void structure() 
+{
 	printf("Number of FAT:\t\t\t%i\n", num_of_fats);
 	printf("Number of sectors used by FAT:\t%i\n", sectors_per_fat);
 	printf("Number of sectors per cluster:\t%i\n", sector_per_cluster);
@@ -148,9 +148,20 @@ structure() {
 	printf("  19 -- 32		ROOT DIRECTORY\n");
 }
 
-
-void help() {
-	printf("Usable commands: fmount, fumount, traverse [-l],structure, showsector [#], showfat, showfile [FILE], help, quit\n");
+void help() 
+{
+	printf("\nFLOP COMMANDS\n");
+	printf("-------------\n\n");
+	printf("fmount: Mounts a floppy disk from an .img file.\n\n");
+	printf("fumount: Unmounts a floppy disk.\n\n");
+	printf("traverse: Lists the content from the root directory.\n\n"); 
+	printf("traverse -l: Lists the content from the root directory in long form.\n\n"); 
+	printf("structure: Lists the strucute of the floppy disk.\n\n");
+	printf("showsector [sector number]: Shows the content of a specified sector number as a hex dump.\n\n");
+	printf("showfat: Shows the content of the first 256 entries in the FAT table as a hex dump.\n\n");
+	printf("showfile [filename]: Shows the contents of the target file as a hex dump.\n\n");
+	printf("help: Shows usable commands.\n\n");
+	printf("quit: Closes the floppy shell.\n\n");
 }
 
 void command(char **argv)
@@ -162,20 +173,21 @@ void command(char **argv)
 		if (strcmp(argv[0], "help") == 0)
 			help();
 		if (strcmp(argv[0], "structure") == 0)
-			if (mounted)
+			if (unmounted)
+				printf("You must mount a floppy first.\n");
+			else
 				structure();
-			else
-				printf("You must mount a floppy first.\n");
 		if(strcmp(argv[0], "showsector") == 0)
-			if (mounted)
+			if (unmounted)
+				printf("You must mount a floppy first.\n");
+			else
 				showsector(argv);
-			else
-				printf("You must mount a floppy first.\n");
 		if(strcmp(argv[0], "traverse") == 0)
-			if (mounted)
-				traverse(counter, argv);
+			if (unmounted)
+				printf("You must mount a floppy first.\n");		
 			else
-				printf("You must mount a floppy first.\n");
+				traverse(counter, argv);
+
 /* TODO
 
 		if(strcmp(argv[0], "showfat") == 0)
