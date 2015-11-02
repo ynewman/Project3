@@ -2,10 +2,6 @@
 
 //global vars
 int fileS;
-unsigned short num_of_sectors;
-unsigned short fat_bytes;
-unsigned short cluster;
-unsigned short bytes_per_sector;
 char *fat_buffer;
 
 //trimWhiteSpace will remove any whitespace in file, directory, and extension names
@@ -36,7 +32,6 @@ void trimWhiteSpace(char *str)
 //will now print file extensions, time and day of last file modify
 void printFiles(char *buf, char *directory, char *flag)
 {
-    cluster = (((unsigned short) buf[26]) & 0xff) | (((unsigned short) buf[27]) & 0x0f)<<8;
     char filename[256], file[9], extension[4];
     unsigned short date, time, month, day,  year, hour, minute, second;
     char attributes[] = "----";
@@ -115,14 +110,14 @@ void printFiles(char *buf, char *directory, char *flag)
 }
 //will print directories...
 void printDir(unsigned short cluster, char *directory, unsigned short file_bytes,
-                       unsigned short num_of_sectors, unsigned short bytes_per_sector, char *flag)
+                       unsigned short sector_per_cluster, unsigned short sector_size, char *flag)
 {
     char buf[32], dir_name[9], single_dir[256], extension[4];
     unsigned short new_cluster, low, high;
     unsigned ptr;
     int counter = 0;
 
-    ptr = (file_bytes + (cluster - 2)*num_of_sectors)*bytes_per_sector;
+    ptr = (file_bytes + (cluster - 2)*sector_per_cluster)*sector_size;
     buf[0] = '$';
     strcpy(single_dir, directory);
     if ((lseek(fileS, ptr, 0)) != ptr) 
@@ -139,7 +134,7 @@ void printDir(unsigned short cluster, char *directory, unsigned short file_bytes
 
     while (buf[0] != 0x0) 
     {
-        if (counter++ >= num_of_sectors*bytes_per_sector/32) 
+        if (counter++ >= sector_per_cluster*sector_size/32) 
         {
             if (cluster%2) 
             {
@@ -159,7 +154,7 @@ void printDir(unsigned short cluster, char *directory, unsigned short file_bytes
             else 
             {
                 counter = 0;
-                ptr = (file_bytes + (cluster - 2)*num_of_sectors)*bytes_per_sector;
+                ptr = (file_bytes + (cluster - 2)*sector_per_cluster)*sector_size;
                 if ((lseek(fileS, ptr, SEEK_SET)) != ptr) 
                 {
                     fprintf(stdout,  "Error: Problem moving the pointer \n");
@@ -196,7 +191,7 @@ void printDir(unsigned short cluster, char *directory, unsigned short file_bytes
                         strcat(single_dir, extension);
                     }
                     strcat(single_dir, "/");
-                    printDir(new_cluster, single_dir, file_bytes, num_of_sectors, bytes_per_sector, flag);
+                    printDir(new_cluster, single_dir, file_bytes, sector_per_cluster, sector_size, flag);
                     // reset pointer
                     lseek(fileS, ptr + counter * 32, SEEK_SET);
                 }
@@ -225,7 +220,7 @@ int traverse(int argc, char **argv) {
 		fprintf(stdout, "Error: Cannot find floppy disk");
 	}
 		
-	unsigned short low, high, num_of_fats, num_of_root_dir, sectors_per_fat, sectors, root_bytes, file_bytes, new_clust;
+	unsigned short sectors, root_bytes, file_bytes, new_clust;
 	char buf[32], directory[256], file[9], extension[4];
 	int i;
 
@@ -239,21 +234,9 @@ int traverse(int argc, char **argv) {
 		fprintf(stdout,  "Error: Could not read from floppy disk, try again.\n");
 		exit(1);
 	}
-	//setting bits
-	low = ((unsigned short) buf[11]) & 0xff;
-	high = ((unsigned short) buf[12]) & 0xff;
-	bytes_per_sector = low | (high << 8);
-	num_of_sectors = ((unsigned short) buf[13]) & 0xff;
-	num_of_fats = ((unsigned short) buf[16]) & 0xff;
-	low = ((unsigned short) buf[17]) & 0xff;
-	high = ((unsigned short) buf[18]) & 0xff;
-	num_of_root_dir = low | (high << 8);
-	low = ((unsigned short) buf[22]) & 0xff;
-	high = ((unsigned short) buf[23]) & 0xff;
-	sectors_per_fat = low | (high << 8);
 
 	//determine size of fat
-	fat_bytes = sectors_per_fat * bytes_per_sector;
+	
 	fat_buffer = (char *) malloc(fat_bytes);
 
 	if ((lseek(fileS, SEEK_SET, SEEK_SET)) != 0) 
@@ -268,7 +251,7 @@ int traverse(int argc, char **argv) {
 		exit(1);
 	}
 
-	sectors = num_of_root_dir * 32 / bytes_per_sector;
+	sectors = root_entries * 32 / sector_size;
 	root_bytes = sectors_per_fat * num_of_fats + 1;
 	file_bytes = root_bytes + sectors;
 	
@@ -286,11 +269,11 @@ int traverse(int argc, char **argv) {
 		fprintf(stdout,  " *****************************\n\n");
 	}
 	
-	for (i = 0;i < num_of_root_dir; i++) 
+	for (i = 0;i < root_entries; i++) 
 	{
 		// go to root entry
-		if ((lseek(fileS, root_bytes * bytes_per_sector + i * 32, 0))
-			!= root_bytes * bytes_per_sector + i * 32) 
+		if ((lseek(fileS, root_bytes * sector_size + i * 32, 0))
+			!= root_bytes * sector_size + i * 32) 
 			{
 		    fprintf(stdout,  "Error: Could not read entries in floppy \n");
 		    exit(1);
@@ -324,7 +307,7 @@ int traverse(int argc, char **argv) {
 			strcat(directory, extension);
 		    }
 		    strcat(directory, "/");
-		    printDir(new_clust, directory, file_bytes, num_of_sectors, bytes_per_sector, flag);
+		    printDir(new_clust, directory, file_bytes, sector_per_cluster, sector_size, flag);
 		    // go back to root dir
 		    strcpy(directory, "/");
 		}

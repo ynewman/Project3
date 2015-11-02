@@ -15,6 +15,14 @@
 
 char image[30];
 
+extern unsigned short sector_size; //512
+extern unsigned short num_of_fats;  //number of FATs
+extern unsigned short sector_per_cluster; //sectors per cluser
+extern unsigned short root_entries; //how many entries
+extern unsigned short sectors_per_fat; //sectors used by fat
+extern unsigned short fat_bytes; //bytes per sector
+extern unsigned short cluster; //number of heads
+
 void split(char *line, char **argv);
 
 int fmount(char **argv);
